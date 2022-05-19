@@ -11,7 +11,7 @@
 <style>
     body,
     .container {
-        background-color: black;
+        background-color: lightblue;
         text-align: center;
         color: white;
         font-family: 'Roboto', sans-serif;
@@ -37,47 +37,188 @@
     li {
         display: inline;
     }
+
+    .proj-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+        gap: .25rem;
+        margin-top: 1rem;
+        margin-left: 1rem;
+    }
+
+    .card>.header {
+        font-size: 1.3rem;
+        margin-bottom: .25rem;
+    }
+
+    .card>.body {
+        font-size: .8rem;
+    }
+
+    a {
+        color: gray;
+        text-decoration: none;
+    }
+
+    .head {
+        padding-top: 10px;
+        padding-bottom: 2.5px;
+        text-align: center;
+        background: #1abc9c;
+        color: white;
+        font-size: 25px;
+    }
+
+    .userframe {
+        width: 800px;
+        height: 300px;
+    }
+
+    .hide {
+        display: none;
+    }
 </style>
 
 <body>
     <div class="container">
-        <div class="main">
-            <h1 class="title">Diamond Studios</h1>
-            <h6 class="title">diamondstudios.dev</h6>
+        <div class="head">
+            <div header-spotify>LISTENING TO SPOTIFY
+                <p data-spotify>SONG DATA LOADING</p>
+            </div>
+        </div>
+        <h1 class="title">Diamond Studios</h1>
+        <h6 class="title">diamondstudios.dev</h6>
 
-            <br>
+        <br>
 
-            <h2>
-                Who am I?
-            </h2>
-            <p>Hey, my name is Diamond and I'm an avid gamer and developer. I enjoy coding in javascript using nodejs
-                but do other things mainly including web design.</p>
+        <h2>
+            Who am I?
+        </h2>
+        <p>Hey, my name is Diamond and I'm an avid gamer and developer. I enjoy coding in javascript using nodejs
+            but do other things mainly including web design.</p>
 
-            <br>
+        <img src="https://lanyard.cnrad.dev/api/632541244035301376" reloadable-image>
 
-            <h2>
-                Jobs & Projects
-            </h2>
+        <br>
 
-            <h6>Date format is dd/mm/yyyy</h6>
+        <h2>
+            Jobs & Projects
+        </h2>
 
-            <ol>
-                <li>
-                    <h1>WESBITE | <a href="https://diamondstudios.dev/">diamondstudios.dev (this website)</a></h1>
-                    <p>Job/Pos: Personal Project -- Sole Maintainer</p>
-                    <p>Date: 11/05/22 -> Ongoing</p>
-                </li>
-                <li>
-                    <h1>DISCORD | <a href="https://diamondstudios.dev/servernet/">Servernet Bot</a></h1>
-                    <p>Job/Pos: Lead Developer</p>
-                    <p>Date: 07/04/22 -> Ongoing</p>
-                </li>
-                <li>
+        <h6>
+            Date format is dd/mm/yyyy
+        </h6>
 
-                </li>
-            </ol>
+        <div class="proj-cards" data-proj-cards-container>
+            <template data-proj-template>
+                <div class="card">
+                    <div class="header" data-header></div>
+                    <div class="body" data-body></div>
+                    <div class="dates" data-dates></div>
+                </div>
+            </template>
         </div>
     </div>
+    </div>
+
+    <script type="module">
+        const projectlist = {
+            projects: [
+                {
+                    "name": "diamondstudios.dev",
+                    "position": "Owner - My website",
+                    "startDate": "14/05/2022",
+                    "endDate": null,
+                    "slug": null // THIS IS THE WEBSITE ALREADY
+                },
+                {
+                    "name": "Servernet Bot",
+                    "position": "Lead Developer - Discord Bot",
+                    "startDate": "7/04/2021",
+                    "endDate": null,
+                    "slug": "/p/servernet-bot"
+                },
+                {
+                    "name": "BTMC",
+                    "position": "Head of Development - Discord Bot",
+                    "startDate": "20/08/2021",
+                    "endDate": "24/12/2021",
+                    "slug": "/p/btmc"
+                }
+            ]
+        };
+
+        const projCardTemplate = document.querySelector("[data-proj-template]");
+        const projCardContainer = document.querySelector("[data-proj-cards-container]");
+
+        for (const project of projectlist.projects) {
+            const card = projCardTemplate.content.cloneNode(true).children[0];
+            const header = card.querySelector("[data-header]");
+            const body = card.querySelector("[data-body]");
+            const date = card.querySelector("[data-dates]");
+
+            const _convDateStr = (str, end) => {
+                if (end == "ongoing" || !end) return `ONGOING. Started: ${str}`;
+                return `${str} - ${end}`;
+            }
+
+            header.textContent = project.name;
+            if (project.slug) header.innerHTML = `<a href="https://diamondstudios.dev${project.slug}">${project.name}</a>`;
+            body.textContent = project.position;
+            date.textContent = _convDateStr(project.startDate, project.endDate);
+
+            projCardContainer.append(card);
+        }
+
+        //https://api.lanyard.rest/v1/users/632541244035301376
+    </script>
+
+    <script>
+        let regularDisplay = document.querySelector("[header-spotify]").style;
+        function updatePage() {
+            const spotifyData = document.querySelector("[data-spotify]");
+            const spotifyHeader = document.querySelector("[header-spotify]");
+            const image = document.querySelector("[reloadable-image]");
+
+            let song = null;
+
+            fetch('https://api.lanyard.rest/v1/users/632541244035301376')
+                .then(res => res.json())
+                .then(d => {
+                    const data = d.data;
+
+                    if (!data.spotify) {
+                        spotifyHeader.classList.toggle("hide", true);
+                    } else {
+                        spotifyHeader.classList.toggle("hide", false);
+                        spotifyHeader.style.dsiplay = regularDisplay;
+
+                        const spotify = data.spotify;
+
+                        const trackname = spotify.song;
+                        const artist = spotify.artist;
+
+                        const str = `${trackname} by ${artist}`;
+                        spotifyData.textContent = str;
+                        song = str;
+                    }
+                });
+            //
+
+            image.src = "https://lanyard.cnrad.dev/api/632541244035301376";
+            return song;
+        }
+
+        setInterval(updatePage, 500);
+    </script>
+
+    <script>
+        // DEBUG FUNCTIONS FOR CONSOLE
+
+        function reload() {
+            location.reload();
+        }
+    </script>
 </body>
 
 </html>
