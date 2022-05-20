@@ -6,12 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diamond Studios</title>
-
-    <title>Diamond Studios</title>
     <meta name="description"
         content="The website for Diamond Studios / Diamond Oreo, the main page to see what I'm doing or to just see what I do in general." />
     <meta name="robots" content="index, follow">
 </head>
+
+<noscript>
+    <meta http-equiv="refresh" content="0.0;url=/nojs/index">
+</noscript>
 
 <style>
     body,
@@ -82,13 +84,45 @@
     .hide {
         display: none;
     }
+
+    .button-1 {
+        background-color: #EA4C89;
+        border-radius: 8px;
+        border-style: none;
+        box-sizing: border-box;
+        color: #FFFFFF;
+        cursor: pointer;
+        display: inline-block;
+        font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        height: 40px;
+        line-height: 20px;
+        list-style: none;
+        margin: 0;
+        outline: none;
+        padding: 10px 16px;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        transition: color 100ms;
+        vertical-align: baseline;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+    }
+
+    .button-1:hover,
+    .button-1:focus {
+        background-color: #F082AC;
+    }
 </style>
 
 <body>
     <div class="container">
         <div class="head">
-            <div header-spotify>LISTENING TO SPOTIFY
-                <p data-spotify>SONG DATA LOADING</p>
+            <div header-spotify>CONTENT NOT LOADING?
+                <p data-spotify><a href="./nojs/index">GO TO NOJS SITE</a></p>
             </div>
         </div>
         <h1 class="title">Diamond Studios</h1>
@@ -123,6 +157,9 @@
                 </div>
             </template>
         </div>
+        <h3 data-stat-code>My Status - 🔴 Check Failed</h3>
+        <button class="button-1" role="button" id="rld-button">Reload Adaptive Items</button>
+        <p>Eg. Listening to or online guesser.</p>
     </div>
     </div>
 
@@ -180,23 +217,28 @@
 
     <script>
         let regularDisplay = document.querySelector("[header-spotify]").style;
+        const spotifyData = document.querySelector("[data-spotify]");
+        const spotifyHeader = document.querySelector("[header-spotify]");
+        const image = document.querySelector("[reloadable-image]");
+
+        spotifyHeader.innerHTML = `Listening to spotify<p data-spotify>ERR</p>`;
         function updatePage() {
             const spotifyData = document.querySelector("[data-spotify]");
             const spotifyHeader = document.querySelector("[header-spotify]");
             const image = document.querySelector("[reloadable-image]");
 
-            let song = null;
-
             fetch('https://api.lanyard.rest/v1/users/632541244035301376')
                 .then(res => res.json())
                 .then(d => {
                     const data = d.data;
+                    updateOnlineStatus(data);
 
                     if (!data.spotify) {
                         spotifyHeader.classList.toggle("hide", true);
                     } else {
                         spotifyHeader.classList.toggle("hide", false);
                         spotifyHeader.style.dsiplay = regularDisplay;
+
 
                         const spotify = data.spotify;
 
@@ -205,15 +247,49 @@
 
                         const str = `${trackname} by ${artist}`;
                         spotifyData.textContent = str;
-                        song = str;
                     }
                 });
             //
 
             image.src = "https://lanyard.cnrad.dev/api/632541244035301376";
-            return song;
         }
 
+        function updateOnlineStatus(data) {
+            const statusCode = document.querySelector("[data-stat-code]");
+
+            const basic_online_check = data.active_on_discord_mobile;
+            const _basic_online_check = data.active_on_discord_desktop;
+
+            let finalCheck = 0;
+
+            // Results in a 1
+            if (data.active_on_discord_desktop) finalCheck = 1;
+
+            // Results in a 2
+            if (data.active_on_discord_web) finalCheck = 2;
+            if (data.spotify) finalCheck = 2;
+
+            // Results in a 3
+            if (data.active_on_discord_mobile) finalCheck = 3;
+
+            const matchCodes = {
+                "0": "🔴 Offline",
+                "1": "🟠 Discord is open, status unknown",
+                "2": "🟡 Likely Online",
+                "3": "🟢 Online"
+
+            }
+
+            const text = matchCodes[finalCheck];
+            statusCode.textContent = "My Status" + text;
+        }
+
+        let btn = document.getElementById("rld-button");
+        btn.addEventListener('click', event => {
+            updatePage();
+        });
+
+        updatePage();
         setInterval(updatePage, 500);
     </script>
 
@@ -223,6 +299,12 @@
         function reload() {
             location.reload();
         }
+
+        function getSong() {
+            return 'FUNCTION REMOVED';
+        }
+
+        function getStatus() { return 'FUNCTION REMOVED'; }
     </script>
 </body>
 
