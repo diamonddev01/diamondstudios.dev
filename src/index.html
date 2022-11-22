@@ -1,20 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diamond Studios</title>
-    <meta name="description"
-        content="The website for Diamond Studios / Diamond Oreo, the main page to see what I'm doing or to just see what I do in general." />
+    <meta name="description" content="The website for Diamond Studios / Diamond Oreo, the main page to see what I'm doing or to just see what I do in general.">
     <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
 </head>
+<style id="MODAL_STYLING">
+.modal {
+  padding: 1em;
+  max-width: 50ch;
+  border: 0;
+  box-shadow: 0 0 1em rgb(0 0 0 / .3);
+}
 
-<noscript>
-    <meta http-equiv="refresh" content="0.0;url=/nojs/index">
-</noscript>
+.modal::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
+</style>
+<style id="MAIN_STYLING">
+body {
+  min-height: 100vh;
+  margin: 2rem;
+  line-height: 1.5;
+  color: black;
+  background-color: lightblue;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin: 0;
+  padding: 0;
+}
 
+h1 em {
+  color: var(--cyan-9);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.button {
+  border: 0;
+  cursor: pointer;
+  background: var(--gray-8);
+  color: var(--gray-2);
+  font-weight: 700;
+  padding: var(--size-2) var(--size-4);
+}
+
+.button:hover,
+.button:focus {
+  background: var(--cyan-9);
+}
+
+form {
+  display: grid;
+  gap: 1em;
+}
+</style>
 <style>
     body,
     .container {
@@ -117,109 +163,126 @@
         background-color: #F082AC;
     }
 </style>
-
+<noscript><meta http-equiv="refresh" content="0.0;url=/nojs/index"></noscript>
 <body>
-    <div class="container">
+    <script id="CONFIG">
+        const WEBSITE_NAME = "Diamond Studios";
+    </script>
+
+
+    <div id="site">
         <div class="head">
             <div header-spotify>CONTENT NOT LOADING?
                 <p data-spotify><a href="./nojs/index">GO TO NOJS SITE</a></p>
             </div>
         </div>
-        <h1 class="title">Diamond Studios</h1>
+        <h1 class="title"><strong>Diamond Studios</strong></h1>
         <h6 class="title">diamondstudios.dev</h6>
 
-        <br>
-
-        <h2>
-            Who am I?
-        </h2>
-        <p>Hey, my name is Diamond and I'm an avid gamer and developer. I enjoy coding in javascript using nodejs
-            but do other things mainly including web design.</p>
-
+        <h2>Who am I?</h2>
+        <p>
+            Hey, my name is Diamond and I'm an avid gamer and developer.<br>
+            I enjoy coding in javascript using nodejs but do other things mainly including web design.
+        </p>
         <img src="https://lanyard.cnrad.dev/api/632541244035301376" reloadable-image>
 
         <br>
 
-        <h2>
-            Jobs & Projects
-        </h2>
-
-        <h6>
-            Date format is dd/mm/yyyy
-        </h6>
-
-        <div class="proj-cards" data-proj-cards-container>
-            <template data-proj-template>
-                <div class="card">
-                    <div class="header" data-header></div>
-                    <div class="body" data-body></div>
-                    <div class="dates" data-dates></div>
-                </div>
-            </template>
-        </div>
-        <h3 data-stat-code>My Status - 🔴 Check Failed</h3>
-        <button class="button-1" role="button" id="rld-button">Reload Adaptive Items</button>
-        <p>Eg. Listening to or online guesser.</p>
-    </div>
+        <h3 data-stat-code>My Status - 🔴 Check Failed | DATE-UNFORMED</h3>
+        <button class="button-1" role="button" id="rld-button">Reload Adaptive Items</button> <button class="button-1"
+            role="button" id="fix-button">Fix Adaptive Items</button>
+        <p>The site is due for a rework. Ⓒ DiamondStudios <strong id="year">2022</strong></p>
     </div>
 
-    <script type="module">
-        const projectlist = {
-            projects: [
-                {
-                    "name": "diamondstudios.dev",
-                    "position": "Owner - My website",
-                    "startDate": "14/05/2022",
-                    "endDate": null,
-                    "slug": null // THIS IS THE WEBSITE ALREADY
-                },
-                {
-                    "name": "Servernet Bot",
-                    "position": "Lead Developer - Discord Bot",
-                    "startDate": "7/04/2021",
-                    "endDate": null,
-                    "slug": "/p/servernet-bot"
-                },
-                {
-                    "name": "BTMC",
-                    "position": "Head of Development - Discord Bot",
-                    "startDate": "20/08/2021",
-                    "endDate": "24/12/2021",
-                    "slug": "/p/btmc"
-                }
-            ]
+    <dialog class="modal" id="404_modal">
+        <h2>Error 404</h2>
+        <p>The page you requested could not be found</p>
+        <button class="close-button" id="close_btn" onclick="close_404()">Close</button>
+    </dialog>
+
+    <script>
+        // Detects the forward and back keys
+        window.onpopstate = function(e){
+            document.getElementById('site').innerHTML = e.state.html
+            document.title = e.state.pageTitle;
         };
 
-        const projCardTemplate = document.querySelector("[data-proj-template]");
-        const projCardContainer = document.querySelector("[data-proj-cards-container]");
+        function LinkToPage(page) {
+            let xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    processAjaxData(this.responseText, page);
+                }
 
-        for (const project of projectlist.projects) {
-            const card = projCardTemplate.content.cloneNode(true).children[0];
-            const header = card.querySelector("[data-header]");
-            const body = card.querySelector("[data-body]");
-            const date = card.querySelector("[data-dates]");
-
-            const _convDateStr = (str, end) => {
-                if (end == "ongoing" || !end) return `ONGOING. Started: ${str}`;
-                return `${str} - ${end}`;
+                if(this.readyState == 4 && this.status == 404) {
+                    _404();
+                }
             }
 
-            header.textContent = project.name;
-            if (project.slug) header.innerHTML = `<a href="https://diamondstudios.dev${project.slug}">${project.name}</a>`;
-            body.textContent = project.position;
-            date.textContent = _convDateStr(project.startDate, project.endDate);
-
-            projCardContainer.append(card);
+            xhttp.open("GET", page, true);
+            xhttp.send();
         }
 
-        //https://api.lanyard.rest/v1/users/632541244035301376
+        window.history.pushState({"html":document.body.innerHTML,"pageTitle":'Page A'}, "");
+
+        function processAjaxData(html, url) {
+            document.getElementById('site').innerHTML = html; // Sets the HTML
+
+            // GETS THE TITLE
+            let finalTitle = WEBSITE_NAME;
+            if(document.getElementById('pageTitle')) {
+                const title = document.getElementById('pageTitle').innerText;
+                document.getElementById('pageTitle').remove();
+                finalTitle = title;
+            }
+
+            console.log(finalTitle)
+            document.title = finalTitle;
+            window.history.pushState({"html":html,"pageTitle":finalTitle}, "", url);
+
+            console.log(JSON.parse(document.getElementById('navbar_data').innerText));
+        }
+
+        function _404() {
+            const modal = document.getElementById('404_modal');
+            modal.showModal();
+        }
+
+        function close_404() {
+            const modal = document.getElementById('404_modal');
+            modal.close();
+
+            if(sys) window.history.pushState({"html":document.body.innerHTML,"pageTitle":document.title}, "", window.location.href.split('?')[0]);
+        }
     </script>
 
+    <!--LOADUP SCRIPT-->
+    <script>
+        let sys = false;
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+
+        let value = params.goto;
+
+        if(value) {
+            // GET THE TRUE PATH
+            value.replace('-', '/');
+            sys = true;
+            LinkToPage('./' + value);
+        }
+    </script>
+
+    <!--Site scripting-->
     <script>
         let regularDisplay = document.querySelector("[header-spotify]").style;
         const spotifyData = document.querySelector("[data-spotify]");
         const spotifyHeader = document.querySelector("[header-spotify]");
         const image = document.querySelector("[reloadable-image]");
+        const year = document.getElementById('year');
+        year.innerText = (new Date()).getFullYear();
+
+        let last = null;
 
         spotifyHeader.innerHTML = `Listening to spotify<p data-spotify>ERR</p>`;
         function updatePage() {
@@ -231,7 +294,15 @@
                 .then(res => res.json())
                 .then(d => {
                     const data = d.data;
+                    //last_data = data;
                     updateOnlineStatus(data);
+
+                    if (last) clearInterval(last);
+
+                    const i = setInterval(updateOnlineStatus, 5, data);
+                    last = i;
+
+                    console.log('FETCHED DATA FROM LANYARD:', Date.now());
 
                     if (!data.spotify) {
                         spotifyHeader.classList.toggle("hide", true);
@@ -249,16 +320,11 @@
                         spotifyData.textContent = str;
                     }
                 });
-            //
-
             image.src = "https://lanyard.cnrad.dev/api/632541244035301376";
         }
 
         function updateOnlineStatus(data) {
             const statusCode = document.querySelector("[data-stat-code]");
-
-            const basic_online_check = data.active_on_discord_mobile;
-            const _basic_online_check = data.active_on_discord_desktop;
 
             let finalCheck = 0;
 
@@ -269,30 +335,49 @@
             if (data.active_on_discord_web) finalCheck = 2;
             if (data.spotify) finalCheck = 2;
 
-            // Results in a 3
-            if (data.active_on_discord_mobile) finalCheck = 3;
+            // Results in a 2
+            if (data.active_on_discord_mobile) finalCheck = 2;
 
             const matchCodes = {
                 "0": "🔴 Offline",
-                "1": "🟠 Discord is open, status unknown",
-                "2": "🟡 Likely Online",
-                "3": "🟢 Online"
+                "1": "🟠 Idle",
+                "2": "🟢 Online"
 
             }
 
-            const text = matchCodes[finalCheck];
-            statusCode.textContent = "My Status " + text;
+            const date = new Date();
+            str = date.toLocaleString('en-UK', { timeZone: 'Europe/London', hour12: false }) + ":" + date.toLocaleString('en-UK', { timeZone: 'Europe/London', hour12: false, fractionalSecondDigits: 2 });
+
+            let text = matchCodes[finalCheck];
+
+            // Check if school:
+            const DayOfWeek = date.getDay();
+            const hourOfDay = date.getHours();
+
+            if (DayOfWeek >= 1 && DayOfWeek < 6) {
+                // Mon - Fri
+                if (hourOfDay >= 8 && hourOfDay < 15) {
+                    text = matchCodes[0]
+                }
+            }
+
+            statusCode.textContent = "My Status: " + text + ' | My Time: ' + str;
         }
 
         let btn = document.getElementById("rld-button");
         btn.addEventListener('click', event => {
             updatePage();
         });
+        btn = document.getElementById("fix-button");
+        btn.addEventListener('click', event => {
+            reload();
+        });
 
         updatePage();
-        setInterval(updatePage, 500);
+        setInterval(updatePage, 5000);
     </script>
 
+    <!--DEBUG FUNCTIONS-->
     <script>
         // DEBUG FUNCTIONS FOR CONSOLE
 
@@ -307,5 +392,4 @@
         function getStatus() { return 'FUNCTION REMOVED'; }
     </script>
 </body>
-
 </html>
